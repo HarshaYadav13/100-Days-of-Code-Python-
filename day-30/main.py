@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 # messagebox is not a class it's a module, so we have to import it separately as * only imports class
 import pyperclip
+import json
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
@@ -32,22 +33,30 @@ def generate_password():
 
 
 def save():
-    if len(password_input.get()) == 0 or len(email_input.get()) == 0:
+    website = website_input.get()
+    email = email_input.get()
+    password = password_input.get()
+
+    new_data = {website: {
+        "email": email,
+        "password": password
+    }}
+
+    if len(password) == 0 or len(email) == 0:
         messagebox.showinfo(title="Oops!", message="Please make sure you haven't left any fields empty.")
     else:
-        is_yes = messagebox.askyesno(title=website_input.get(), message=f"Email/Username: {email_input.get()}"
-                                                                        f"\nPassword: {password_input.get()}"
-                                                                        f"\nDo you want to save it?")
+        with open("password.json", mode='r') as data_file:
+            data = json.load(data_file)
+            data.update(data_file)
 
-        if is_yes:
-            with open("passwords.txt", mode='a') as file:
-                file.write(f"{website_input.get()} | {email_input.get()} | {password_input.get()}\n")
+        with open('password.json', 'w') as data_file:
+            json.dump(data, data_file, indent=4)
 
-            website_input.delete(0, END)
-            email_input.delete(0, END)
-            password_input.delete(0, END)
+        website_input.delete(0, END)
+        email_input.delete(0, END)
+        password_input.delete(0, END)
 
-            messagebox.showinfo(title="Saved", message="Password added successfully.")
+        messagebox.showinfo(title="Saved", message="Password added successfully.")
 
     website_input.focus()
 
@@ -62,15 +71,15 @@ logo_img = PhotoImage(file="logo.png")
 canvas.create_image(100, 100, image=logo_img)
 canvas.grid(row=0, column=1)
 
-website = Label(text="Website: ", padx=5, pady=5)
-website.grid(row=1, column=0)
+website_label = Label(text="Website: ", padx=5, pady=5)
+website_label.grid(row=1, column=0)
 
 website_input = Entry(width=35)
 website_input.focus()  # to set the cursor in this text field
 website_input.grid(row=1, column=1, columnspan=2)
 
-email = Label(text="Email/Username:", padx=5, pady=5)
-email.grid(row=2, column=0)
+email_label = Label(text="Email/Username:", padx=5, pady=5)
+email_label.grid(row=2, column=0)
 
 email_input = Entry(width=35)
 email_input.insert(END, string="@gmail.com")
