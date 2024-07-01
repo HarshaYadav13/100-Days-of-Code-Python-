@@ -37,24 +37,34 @@ def save():
     email = email_input.get()
     password = password_input.get()
 
-    new_data = {website: {
-        "email": email,
-        "password": password
-    }}
+    new_data = {
+        website: {
+            "email": email,
+            "password": password
+        }}
 
     if len(password) == 0 or len(email) == 0:
         messagebox.showinfo(title="Oops!", message="Please make sure you haven't left any fields empty.")
     else:
-        with open("password.json", mode='r') as data_file:
-            data = json.load(data_file)
-            data.update(data_file)
+        try:
+            # reading the existing data
+            with open('password.json', 'r') as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+            with open('password.json', 'w') as data_file:
+                # writing data to the file
+                json.dump(new_data, data_file, indent=4)
+        else:
+            # adding new data to the existing data
+            data.update(new_data)
 
-        with open('password.json', 'w') as data_file:
-            json.dump(data, data_file, indent=4)
-
-        website_input.delete(0, END)
-        email_input.delete(0, END)
-        password_input.delete(0, END)
+            with open('password.json', 'w') as data_file:
+                # saving new data
+                json.dump(data, data_file, indent=4)
+        finally:
+            website_input.delete(0, END)
+            email_input.delete(0, END)
+            password_input.delete(0, END)
 
         messagebox.showinfo(title="Saved", message="Password added successfully.")
 
